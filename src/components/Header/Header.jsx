@@ -8,7 +8,6 @@ function Header({
   word,
   setWords,
   darkMode,
-  setDarkMode,
   history,
   setHistory,
 }) {
@@ -39,14 +38,6 @@ function Header({
           <span className="brand-icon">📖</span>
           <span className="brand-name">WordWise</span>
         </div>
-        <button
-          className="theme-toggle"
-          onClick={() => setDarkMode((d) => !d)}
-          aria-label="Toggle dark mode"
-          title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
-        >
-          {darkMode ? "☀️" : "🌙"}
-        </button>
       </div>
 
       {/* ── Hero title ── */}
