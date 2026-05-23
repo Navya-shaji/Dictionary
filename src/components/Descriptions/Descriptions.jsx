@@ -1,50 +1,230 @@
-import React from 'react';
-import './Description.css';
+import React from "react";
+import "./Description.css";
 
-function Descriptions({ word, meanings, category }) {
-  console.log(word, meanings, category);
+// Part-of-speech badge colors
+const posColors = {
+  noun:        { bg: "#ede9fe", text: "#7c3aed" },
+  verb:        { bg: "#dcfce7", text: "#16a34a" },
+  adjective:   { bg: "#fef9c3", text: "#a16207" },
+  adverb:      { bg: "#ffedd5", text: "#c2410c" },
+  pronoun:     { bg: "#dbeafe", text: "#1d4ed8" },
+  preposition: { bg: "#fce7f3", text: "#be185d" },
+  conjunction: { bg: "#e0f2fe", text: "#0369a1" },
+  interjection:{ bg: "#fee2e2", text: "#b91c1c" },
+  article:     { bg: "#f3f4f6", text: "#374151" },
+};
+
+const darkPosColors = {
+  noun:        { bg: "#3b0764", text: "#c4b5fd" },
+  verb:        { bg: "#052e16", text: "#86efac" },
+  adjective:   { bg: "#422006", text: "#fde68a" },
+  adverb:      { bg: "#431407", text: "#fdba74" },
+  pronoun:     { bg: "#1e3a5f", text: "#93c5fd" },
+  preposition: { bg: "#500724", text: "#f9a8d4" },
+  conjunction: { bg: "#0c4a6e", text: "#7dd3fc" },
+  interjection:{ bg: "#450a0a", text: "#fca5a5" },
+  article:     { bg: "#1f2937", text: "#9ca3af" },
+};
+
+function PosBadge({ pos, darkMode }) {
+  const palette = darkMode ? darkPosColors : posColors;
+  const colors = palette[pos?.toLowerCase()] ?? (darkMode
+    ? { bg: "#1e1e35", text: "#a5b4fc" }
+    : { bg: "#e0e7ff", text: "#4338ca" });
   return (
-    
-    <div>
-      <div className='Audio'>
-    {meanings[0] && meanings[0].phonetics[0] && meanings[0].phonetics[0].audio && (
-        <audio controls>
-          <source src={meanings[0].phonetics[0].audio} type="audio/mpeg" />
-          Your browser does not support the audio element.
-        </audio>
-      )}
-        
+    <span
+      className="pos-badge"
+      style={{ background: colors.bg, color: colors.text }}
+    >
+      {pos}
+    </span>
+  );
+}
+
+function Descriptions({ word, meanings, category, loading, error, darkMode }) {
+  // ── Loading skeleton ──────────────────────────────────────
+  if (loading) {
+    return (
+      <div className={`desc-container ${darkMode ? "dark" : "light"}`}>
+        <div className="skeleton-wrap">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton-line wide" />
+              <div className="skeleton-line medium" />
+              <div className="skeleton-line narrow" />
+            </div>
+          ))}
+        </div>
       </div>
-      {word === "" ? (
-        <span className="subTitles">Start Typing Something....</span>
-      ) : (
-        meanings.map((means) =>
-          means.meanings.map((items) =>
-            items.definitions.map((def) => (
-              <div  className="singleMean">
-                <p>{def.definition}</p>
+    );
+  }
+
+  // ── Empty state ───────────────────────────────────────────
+  if (!word) {
+    return (
+      <div className={`desc-container ${darkMode ? "dark" : "light"}`}>
+        <div className="empty-state">
+          <div className="empty-icon">📚</div>
+          <h2 className="empty-title">Start exploring words</h2>
+          <p className="empty-sub">
+            Type any word above to see its definition, phonetics, examples,
+            synonyms, and antonyms — in 30+ languages.
+          </p>
+          <div className="suggestion-chips">
+            {["serendipity", "ephemeral", "resilience", "wanderlust", "solitude"].map(
+              (w) => (
+                <span key={w} className="suggestion-chip">
+                  {w}
+                </span>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Error states ──────────────────────────────────────────
+  if (error === "no_word") {
+    return (
+      <div className={`desc-container ${darkMode ? "dark" : "light"}`}>
+        <div className="error-state">
+          <div className="error-icon">🔍</div>
+          <h2 className="error-title">No results for &ldquo;{word}&rdquo;</h2>
+          <p className="error-sub">
+            This word wasn&apos;t found in the dictionary. Try checking the
+            spelling or switching to a different language.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error === "network") {
+    return (
+      <div className={`desc-container ${darkMode ? "dark" : "light"}`}>
+        <div className="error-state">
+          <div className="error-icon">⚡</div>
+          <h2 className="error-title">Connection error</h2>
+          <p className="error-sub">
+            Couldn&apos;t reach the dictionary API. Please check your internet
+            connection and try again.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!meanings || meanings.length === 0) return null;
+
+  // ── Phonetics ─────────────────────────────────────────────
+  const allPhonetics = meanings.flatMap((m) => m.phonetics ?? []);
+  const phoneticsWithText = allPhonetics.filter((p) => p.text);
+  const phoneticsWithAudio = allPhonetics.filter((p) => p.audio);
+
+  // ── Meanings grouped by part of speech ───────────────────
+  const grouped = {};
+  meanings.forEach((entry) => {
+    (entry.meanings ?? []).forEach((m) => {
+      const pos = m.partOfSpeech ?? "other";
+      if (!grouped[pos]) grouped[pos] = [];
+      grouped[pos].push(...(m.definitions ?? []));
+    });
+  });
+
+  return (
+    <div className={`desc-container ${darkMode ? "dark" : "light"}`}>
+      {/* ── Word header card ── */}
+      <div className="word-header-card">
+        <div className="word-header-left">
+          <h2 className="word-display">{word}</h2>
+          {phoneticsWithText.length > 0 && (
+            <div className="phonetics-row">
+              {[...new Set(phoneticsWithText.map((p) => p.text))].map(
+                (text, i) => (
+                  <span key={i} className="phonetic-text">
+                    {text}
+                  </span>
+                )
+              )}
+            </div>
+          )}
+        </div>
+        {phoneticsWithAudio.length > 0 && (
+          <div className="audio-wrap">
+            <audio controls key={phoneticsWithAudio[0].audio}>
+              <source src={phoneticsWithAudio[0].audio} type="audio/mpeg" />
+            </audio>
+          </div>
+        )}
+      </div>
+
+      {/* ── Definitions by part of speech ── */}
+      {Object.entries(grouped).map(([pos, defs]) => (
+        <div key={pos} className="pos-section">
+          <div className="pos-header">
+            <PosBadge pos={pos} darkMode={darkMode} />
+            <div className="pos-divider" />
+          </div>
+
+          <ol className="def-list">
+            {defs.map((def, idx) => (
+              <li key={idx} className="def-item">
+                <p className="def-text">{def.definition}</p>
 
                 {def.example && (
-                  <span>
-                    <b>Example:</b> {def.example}
-                  </span>
+                  <div className="def-example">
+                    <span className="def-label">Example</span>
+                    <span className="def-example-text">
+                      &ldquo;{def.example}&rdquo;
+                    </span>
+                  </div>
                 )}
 
-                {def.synonyms && def.synonyms.length > 0 && (
-                  <span>
-                    <b>Synonyms:</b> {def.synonyms.join(', ')}
-                  </span>
-                )}
+                <div className="def-tags-row">
+                  {def.synonyms?.length > 0 && (
+                    <div className="def-tags">
+                      <span className="def-label syn">Synonyms</span>
+                      {def.synonyms.slice(0, 6).map((s) => (
+                        <span key={s} className="tag syn-tag">
+                          {s}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {def.antonyms?.length > 0 && (
+                    <div className="def-tags">
+                      <span className="def-label ant">Antonyms</span>
+                      {def.antonyms.slice(0, 6).map((a) => (
+                        <span key={a} className="tag ant-tag">
+                          {a}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
 
-                {def.antonyms && def.antonyms.length > 0 && (
-                  <span>
-                    <b>Antonyms:</b> {def.antonyms.join(', ')}
-                  </span>
-                )}
-              </div>
-            ))
-          )
-        )
+      {/* ── Source links ── */}
+      {meanings[0]?.sourceUrls?.length > 0 && (
+        <div className="source-row">
+          <span className="source-label">Sources:</span>
+          {meanings[0].sourceUrls.map((url) => (
+            <a
+              key={url}
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="source-link"
+            >
+              {new URL(url).hostname}
+            </a>
+          ))}
+        </div>
       )}
     </div>
   );

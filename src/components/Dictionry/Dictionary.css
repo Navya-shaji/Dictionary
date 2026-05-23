@@ -1,0 +1,51 @@
+/* ── Root layout ─────────────────────────────────────────── */
+.app-root {
+  min-height: 100vh;
+  position: relative;
+  transition: background 0.4s ease, color 0.4s ease;
+}
+
+.app-root.light {
+  background: #f0f4ff;
+  color: #1a1a2e;
+}
+
+.app-root.dark {
+  background: #0d0d1a;
+  color: #e8eaf6;
+}
+
+/* ── Animated gradient blob in background ────────────────── */
+.bg-gradient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(236, 72, 153, 0.14) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
+  animation: blobShift 12s ease-in-out infinite alternate;
+}
+
+.app-root.dark .bg-gradient {
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.28) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(236, 72, 153, 0.22) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
+}
+
+@keyframes blobShift {
+  0%   { transform: scale(1) translate(0, 0); }
+  50%  { transform: scale(1.05) translate(2%, 1%); }
+  100% { transform: scale(1) translate(-1%, -2%); }
+}
+
+/* ── Content wrapper ─────────────────────────────────────── */
+.app-content {
+  position: relative;
+  z-index: 1;
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 16px 60px;
+}

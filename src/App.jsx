@@ -1,13 +1,8 @@
+import Dictionary from "./components/Dictionry/dictionary";
+import "./App.css";
 
-import Dictionary from "./components/Dictionry/dictionary"
 function App() {
-  
-
-  return (
-    <>
-     <Dictionary/>
-    </>
-  )
+  return <Dictionary />;
 }
 
-export default App
+export default App;

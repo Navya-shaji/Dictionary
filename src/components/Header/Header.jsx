@@ -1,132 +1,141 @@
-
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { TextField, MenuItem, Container, Box } from "@mui/material";
-import React from "react";
-import "./Header.css";
+import React, { useRef } from "react";
 import Data from "../Data/data";
+import "./Header.css";
 
-function Header({ category, setCategory, word, setWords,setMeanings }) {
-  const HandleChange = (e) => {
+function Header({
+  category,
+  setCategory,
+  word,
+  setWords,
+  darkMode,
+  setDarkMode,
+  history,
+  setHistory,
+}) {
+  const inputRef = useRef(null);
+
+  const handleLanguageChange = (e) => {
     setCategory(e.target.value);
     setWords("");
-    setMeanings([]);
   };
 
-  const theme = createTheme({
-    palette: {
-      mode: "light",
-      primary: {
-        main: "#3f51b5",
-      },
-      secondary: {
-        main: "#f50057",
-      },
-      background: {
-        default: "#f5f5f5",
-        paper: "#ffffff",
-      },
-    },
-    typography: {
-      fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-      h1: {
-        fontWeight: 700,
-        fontSize: "2.5rem",
-        "@media (max-width:600px)": {
-          fontSize: "2rem",
-        },
-      },
-    },
-    components: {
-      MuiTextField: {
-        styleOverrides: {
-          root: {
-            margin: "8px",
-            width: "100%",
-            maxWidth: "320px",
-            "& label.Mui-focused": {
-              color: "#3f51b5",
-            },
-            "& .MuiOutlinedInput-root": {
-              "&.Mui-focused fieldset": {
-                borderColor: "#3f51b5",
-              },
-            },
-          },
-        },
-      },
-    },
-  });
+  const handleHistoryClick = (w) => {
+    setWords(w);
+    inputRef.current?.focus();
+  };
+
+  const removeHistory = (e, w) => {
+    e.stopPropagation();
+    setHistory((prev) => prev.filter((h) => h !== w));
+  };
+
+  const selectedLang = Data.find((d) => d.value === category);
 
   return (
-    <ThemeProvider theme={theme}>
-      <Container maxWidth="lg" className="header-container">
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            padding: "30px 0",
-            width: "100%",
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: "8px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-            marginTop: "20px",
-            marginBottom: "20px",
-          }}
+    <header className={`header ${darkMode ? "dark" : "light"}`}>
+      {/* ── Top bar ── */}
+      <div className="header-topbar">
+        <div className="brand">
+          <span className="brand-icon">📖</span>
+          <span className="brand-name">WordWise</span>
+        </div>
+        <button
+          className="theme-toggle"
+          onClick={() => setDarkMode((d) => !d)}
+          aria-label="Toggle dark mode"
+          title={darkMode ? "Switch to light mode" : "Switch to dark mode"}
         >
-          <h1 className="header-title">{word ? word : "WordWise"}</h1>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              justifyContent: "center",
-              alignItems: "center",
-              width: "100%",
-              padding: "10px",
-            }}
-          >
-            <div>
-            <TextField
-              id="standard-basic"
-              label="Search a Word"
-              variant="outlined"
-              className="text-field"
-              value={word}
-              onChange={(e) => setWords(e.target.value)}
-              sx={{
-                margin: "10px",
-                minWidth: { xs: "250px", md: "300px" },
-              }}
-            />
-           </div>
-           <div>
-            <TextField
-              id="outlined-select-currency"
-              select
-              label="Select Language"
-              value={category}
-              onChange={HandleChange}
-              defaultValue="English"
-              helperText="Please select your language"
-              className="text-field"
-              sx={{
-                margin: "20px",
-                minWidth: { xs: "250px", md: "300px"  },
-                marginTop: "43px",
-              }}
-            >
+          {darkMode ? "☀️" : "🌙"}
+        </button>
+      </div>
 
-              {Data.map((option) => (
-                <MenuItem key={option.label} value={option.value}>
-                  {option.value}
-                </MenuItem>
-              ))}
-            </TextField>
-            </div>
-          </Box>
-        </Box>
-      </Container>
-    </ThemeProvider>
+      {/* ── Hero title ── */}
+      <div className="header-hero">
+        <h1 className="hero-title">
+          {word ? (
+            <span className="hero-word">{word}</span>
+          ) : (
+            <>
+              Discover the world&apos;s{" "}
+              <span className="hero-highlight">words</span>
+            </>
+          )}
+        </h1>
+        <p className="hero-sub">
+          Definitions · Phonetics · Examples · Synonyms · Antonyms
+        </p>
+      </div>
+
+      {/* ── Search row ── */}
+      <div className="search-row">
+        {/* Language selector */}
+        <div className="lang-select-wrap">
+          <span className="lang-flag">{selectedLang?.flag ?? "🌐"}</span>
+          <select
+            className="lang-select"
+            value={category}
+            onChange={handleLanguageChange}
+            aria-label="Select language"
+          >
+            {Data.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.flag} {opt.label}
+              </option>
+            ))}
+          </select>
+          <span className="select-arrow">▾</span>
+        </div>
+
+        {/* Search input */}
+        <div className="search-input-wrap">
+          <span className="search-icon">🔍</span>
+          <input
+            ref={inputRef}
+            type="text"
+            className="search-input"
+            placeholder="Search a word…"
+            value={word}
+            onChange={(e) => setWords(e.target.value)}
+            aria-label="Search a word"
+            autoComplete="off"
+            spellCheck="false"
+          />
+          {word && (
+            <button
+              className="clear-btn"
+              onClick={() => setWords("")}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Search history chips ── */}
+      {history.length > 0 && (
+        <div className="history-row" aria-label="Recent searches">
+          <span className="history-label">Recent:</span>
+          {history.map((w) => (
+            <button
+              key={w}
+              className="history-chip"
+              onClick={() => handleHistoryClick(w)}
+            >
+              {w}
+              <span
+                className="chip-remove"
+                onClick={(e) => removeHistory(e, w)}
+                role="button"
+                aria-label={`Remove ${w} from history`}
+              >
+                ×
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
+    </header>
   );
 }
 
