@@ -1,7 +1,7 @@
-/* Import Inter font from Google Fonts — must be first */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
+/* ── Fonts ───────────────────────────────────────────────── */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&family=IM+Fell+English:ital@0;1&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap");
 
-/* ── Global reset & base ─────────────────────────────────── */
+/* ── Global reset ────────────────────────────────────────── */
 *,
 *::before,
 *::after {
@@ -10,37 +10,26 @@
   padding: 0;
 }
 
-html {
-  scroll-behavior: smooth;
-}
+html { scroll-behavior: smooth; }
 
 body {
-  font-family: "Inter", "Segoe UI", "Roboto", "Helvetica Neue", Arial, sans-serif;
+  font-family: "Crimson Text", "Georgia", serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
-/* Scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+/* ── Scrollbar ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar-track { background: #2a1a0e; }
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.3);
-  border-radius: 3px;
+  background: #8b6914;
+  border-radius: 4px;
 }
+::-webkit-scrollbar-thumb:hover { background: #c9a84c; }
 
-::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.6);
-}
-
-/* Selection color */
+/* ── Selection ───────────────────────────────────────────── */
 ::selection {
-  background: rgba(99, 102, 241, 0.25);
+  background: rgba(201, 168, 76, 0.35);
   color: inherit;
 }

@@ -1,51 +1,89 @@
-/* ── Root layout ─────────────────────────────────────────── */
+/* ═══════════════════════════════════════════════════════════
+   ROOT  —  Vintage Library Theme
+   Palette:
+     Dark wood   #1a0e05  /  #2a1a0e  /  #3d2410
+     Mid wood    #5c3317  /  #7a4520
+     Gold        #c9a84c  /  #e8c96a  /  #f5e6a3
+     Aged paper  #f2e8d0  /  #e8d5a3  /  #d4b896
+     Ink         #1c1008  /  #2d1a08
+═══════════════════════════════════════════════════════════ */
+
+/* ── Root ────────────────────────────────────────────────── */
 .app-root {
   min-height: 100vh;
   position: relative;
-  transition: background 0.4s ease, color 0.4s ease;
+  color: #1c1008;
+  /* Rich dark wood background */
+  background-color: #1a0e05;
+  background-image:
+    /* Wood grain texture via repeating gradients */
+    repeating-linear-gradient(
+      92deg,
+      transparent 0px,
+      transparent 18px,
+      rgba(255,255,255,0.012) 18px,
+      rgba(255,255,255,0.012) 19px
+    ),
+    repeating-linear-gradient(
+      180deg,
+      transparent 0px,
+      transparent 60px,
+      rgba(0,0,0,0.08) 60px,
+      rgba(0,0,0,0.08) 61px
+    ),
+    /* Warm amber vignette */
+    radial-gradient(ellipse 120% 80% at 50% 0%,   #3d2410 0%, #1a0e05 60%),
+    radial-gradient(ellipse 80%  60% at 10% 50%,  #2a1a0e 0%, transparent 70%),
+    radial-gradient(ellipse 80%  60% at 90% 50%,  #2a1a0e 0%, transparent 70%);
 }
 
-.app-root.light {
-  background: #f0f4ff;
-  color: #1a1a2e;
+/* ── Bookshelf top & bottom ledge ────────────────────────── */
+.app-root::before,
+.app-root::after {
+  content: "";
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 18px;
+  z-index: 100;
+  background: linear-gradient(180deg, #5c3317 0%, #3d2410 40%, #2a1a0e 100%);
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+.app-root::before { top: 0; }
+.app-root::after  {
+  bottom: 0;
+  background: linear-gradient(0deg, #5c3317 0%, #3d2410 40%, #2a1a0e 100%);
 }
 
-.app-root.dark {
-  background: #0d0d1a;
-  color: #e8eaf6;
-}
-
-/* ── Animated gradient blob in background ────────────────── */
+/* ── Ambient lamp glow ───────────────────────────────────── */
 .bg-gradient {
   position: fixed;
   inset: 0;
   z-index: 0;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(236, 72, 153, 0.14) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 70%);
-  animation: blobShift 12s ease-in-out infinite alternate;
+    /* Warm lamp glow top-left */
+    radial-gradient(ellipse 55% 45% at 15% 20%, rgba(201,168,76,0.18) 0%, transparent 65%),
+    /* Soft fill center */
+    radial-gradient(ellipse 70% 60% at 50% 40%, rgba(92,51,23,0.25) 0%, transparent 70%),
+    /* Deep shadow edges */
+    radial-gradient(ellipse 40% 50% at 90% 80%, rgba(10,5,2,0.5) 0%, transparent 60%);
+  animation: lampFlicker 8s ease-in-out infinite alternate;
 }
 
-.app-root.dark .bg-gradient {
-  background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(99, 102, 241, 0.28) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 80% 80%, rgba(236, 72, 153, 0.22) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 40% at 50% 50%, rgba(16, 185, 129, 0.12) 0%, transparent 70%);
-}
-
-@keyframes blobShift {
-  0%   { transform: scale(1) translate(0, 0); }
-  50%  { transform: scale(1.05) translate(2%, 1%); }
-  100% { transform: scale(1) translate(-1%, -2%); }
+@keyframes lampFlicker {
+  0%   { opacity: 1; }
+  30%  { opacity: 0.92; }
+  55%  { opacity: 0.97; }
+  75%  { opacity: 0.88; }
+  100% { opacity: 1; }
 }
 
 /* ── Content wrapper ─────────────────────────────────────── */
 .app-content {
   position: relative;
   z-index: 1;
-  max-width: 860px;
+  max-width: 880px;
   margin: 0 auto;
-  padding: 0 16px 60px;
+  padding: 28px 20px 80px;
 }

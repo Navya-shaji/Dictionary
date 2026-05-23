@@ -12,16 +12,23 @@ function Dictionary() {
   const [error, setError] = useState(null);
   const [darkMode, setDarkMode] = useState(false);
   const [history, setHistory] = useState([]);
+  const [wordImage, setWordImage] = useState(null);
 
   const fetchWord = useCallback(async () => {
     if (!word.trim()) return;
     setLoading(true);
     setError(null);
+    // Reset image on new search
+    setWordImage(null);
     try {
       const { data } = await axios.get(
         `https://api.dictionaryapi.dev/api/v2/entries/${category}/${word.trim()}`
       );
       setMeanings(data);
+      // Set Unsplash image URL — loads lazily in the browser
+      setWordImage(
+        `https://source.unsplash.com/featured/600x400/?${encodeURIComponent(word.trim())}`
+      );
       // Add to history (keep last 8 unique words)
       setHistory((prev) => {
         const filtered = prev.filter((w) => w !== word.trim());
@@ -29,6 +36,7 @@ function Dictionary() {
       });
     } catch (err) {
       setMeanings([]);
+      setWordImage(null);
       if (err.response?.status === 404) {
         setError("no_word");
       } else {
@@ -71,6 +79,7 @@ function Dictionary() {
           loading={loading}
           error={error}
           darkMode={darkMode}
+          wordImage={wordImage}
         />
       </div>
     </div>

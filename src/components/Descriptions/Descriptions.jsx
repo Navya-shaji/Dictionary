@@ -1,5 +1,34 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Description.css";
+
+// ── Word image with loading/error states ──────────────────
+function WordImage({ src, word, darkMode }) {
+  const [imgState, setImgState] = useState("loading"); // loading | loaded | error
+
+  if (!src) return null;
+
+  return (
+    <div className={`word-image-wrap ${darkMode ? "dark" : "light"} ${imgState}`}>
+      {imgState === "loading" && (
+        <div className="word-image-skeleton" />
+      )}
+      <img
+        src={src}
+        alt={`Visual for "${word}"`}
+        className="word-image"
+        style={{ display: imgState === "loaded" ? "block" : "none" }}
+        onLoad={() => setImgState("loaded")}
+        onError={() => setImgState("error")}
+      />
+      {imgState === "error" && (
+        <div className="word-image-fallback">
+          <span>🖼️</span>
+          <p>No image found</p>
+        </div>
+      )}
+    </div>
+  );
+}
 
 // Part-of-speech badge colors
 const posColors = {
@@ -41,7 +70,7 @@ function PosBadge({ pos, darkMode }) {
   );
 }
 
-function Descriptions({ word, meanings, category, loading, error, darkMode }) {
+function Descriptions({ word, meanings, category, loading, error, darkMode, wordImage }) {
   // ── Loading skeleton ──────────────────────────────────────
   if (loading) {
     return (
@@ -134,6 +163,9 @@ function Descriptions({ word, meanings, category, loading, error, darkMode }) {
 
   return (
     <div className={`desc-container ${darkMode ? "dark" : "light"}`}>
+      {/* ── Word image ── */}
+      <WordImage src={wordImage} word={word} darkMode={darkMode} />
+
       {/* ── Word header card ── */}
       <div className="word-header-card">
         <div className="word-header-left">
